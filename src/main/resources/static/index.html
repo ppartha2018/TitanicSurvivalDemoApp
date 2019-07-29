@@ -41,11 +41,9 @@
 	<script src="https://code.highcharts.com/modules/export-data.js"></script>
 
     <script type="text/javascript">
-    var rec;
         $(document).ready(function () {
         	
             var url = "/demo/passengers";
-           // var url = "/demo/filter";
             // prepare the data
             var source =
             {
@@ -129,13 +127,13 @@
                     { text: 'Start Station', datafield: 'embarkedStation', width: 100, }
                 ]
             });
-            $("#jqxgrid").bind("pagechanged", function (event) {
+            $("#grid").bind("pagechanged", function (event) {
                 var args = event.args;
                 var pagenumber = args.pagenum;
                 var pagesize = args.pagesize;
                 source = []
             });
-            $("#jqxgrid").bind("pagesizechanged", function (event) {
+            $("#grid").bind("pagesizechanged", function (event) {
                 var args = event.args;
                 var pagenumber = args.pagenum;
                 var pagesize = args.pagesize;
@@ -147,13 +145,12 @@
                 var fileName = args.file;
                 var serverResponse = args.response;
                 $('#upload-message').html(serverResponse);
+                $('#grid').jqxGrid('updatebounddata');
             });
             
         	 // prepare chart data
         	 // Build the chart
         	 function drawChart(records){
-        		 console.log(records)
-        		 rec = records;
         		 var yes = 0, no = 0, total = 0;
         		 for (const key of Object.keys(records)) {
         			    if(records[key].survived == true) yes++; else no++;

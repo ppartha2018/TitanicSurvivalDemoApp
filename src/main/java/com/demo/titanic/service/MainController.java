@@ -74,7 +74,6 @@ public class MainController {
 		Pageable pageCondition = null;
 		Page<Person> persons = null;
 		try {
-			System.out.println("you hit me!");
 			if(sortField != null && sortField.isPresent() && !sortField.get().equals("")) {
 				//default sort order is ASC if ordering is not specified or wrong values given for sort order
 				Direction sortDirection = Sort.Direction.ASC;
