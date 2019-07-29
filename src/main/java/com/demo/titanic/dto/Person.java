@@ -7,6 +7,7 @@ import javax.persistence.Id;
 
 import com.demo.titanic.utils.NumericBooleanDeserializer;
 import com.demo.titanic.utils.NumericIntegerDeSerializer;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -15,50 +16,50 @@ public class Person implements Serializable {
 
 	/**
 	 * DTO Object that reflects the database table.
-	 * JPA/ORM framework methods work on transfering this entity to and from database. Jackson framework methods work on objects of this type
-	 * for coversion between POJO's to CSV/JSON and vice versa.
-	 * JsonProperty tags are used to as a customer mapper between properties on csv file to database field names.
-	 * Some of the fields are augmented with Deserializer to help in right conversion of some data types from fields in csv.
+	 * JPA/ORM framework methods work on transferring this entity to and from database. Jackson framework methods work on objects of this type
+	 * for conversion between POJO's properties to CSV/JSON properties and vice versa.
+	 * JsonAlias tags are used as custom mappers between properties on certain upload (eg: csv) file to database field names.
+	 * Some of the fields are augmented with De-serializer to help in right conversion of some data types from fields of different file format like csv.
 	 */
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@JsonProperty("PassengerId")
+	@JsonAlias("PassengerId")
 	private Long passengerId;
 	
-	@JsonProperty("Survived")
+	@JsonAlias("Survived")
 	@JsonDeserialize(using=NumericBooleanDeserializer.class)
 	private boolean survived;
 	
-	@JsonProperty("Pclass")
+	@JsonAlias("Pclass")
 	private int passengerClass;
 	
-	@JsonProperty("Name")
+	@JsonAlias("Name")
 	private String name;
 	
-	@JsonProperty("Sex")
+	@JsonAlias("Sex")
 	private String sex;
 	
-	@JsonProperty("Age")
+	@JsonAlias("Age")
 	@JsonDeserialize(using=NumericIntegerDeSerializer.class)
 	private int age;
 	
-	@JsonProperty("SibSp")
+	@JsonAlias("SibSp")
 	private int siblingSpouseCount;
 	
-	@JsonProperty("Parch")
+	@JsonAlias("Parch")
 	private int parentChildCount;
 	
-	@JsonProperty("Ticket")
+	@JsonAlias("Ticket")
 	private String ticketId;
 	
-	@JsonProperty("Fare")
+	@JsonAlias("Fare")
 	private double fare;
 	
-	@JsonProperty("Cabin")
+	@JsonAlias("Cabin")
 	private String cabinId;
 	
-	@JsonProperty("Embarked")
+	@JsonAlias("Embarked")
 	private String embarkedStation;
 	
 	public Long getPassengerId() {
