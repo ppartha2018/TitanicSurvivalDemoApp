@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title id='Description'>This demo illustrates the basic functionality of the Grid plugin. The jQWidgets Grid plugin offers rich support for interacting with data, including paging, grouping and sorting. 
+    </title>
+    <meta name="description" content="JavaScript Grid with rich support for Data Filtering, Paging, Editing, Sorting and Grouping" />
+    
+    <!-- Bootstrap imports -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    
+    <!-- JQX GRID imports -->
+    <link rel="stylesheet" href="../../jqwidgets/styles/jqx.base.css" type="text/css" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1 minimum-scale=1" />
+    <script type="text/javascript" src="../../scripts/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxcore.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxdata.js"></script> 
+    <script type="text/javascript" src="../../jqwidgets/jqxbuttons.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxscrollbar.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxmenu.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxcheckbox.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxlistbox.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxdropdownlist.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxgrid.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxgrid.sort.js"></script> 
+    <script type="text/javascript" src="../../jqwidgets/jqxgrid.filter.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxgrid.pager.js"></script> 
+    <script type="text/javascript" src="../../jqwidgets/jqxgrid.selection.js"></script> 
+    <script type="text/javascript" src="../../jqwidgets/jqxgrid.edit.js"></script> 
+    <script type="text/javascript" src="../../scripts/demos.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxfileupload.js"></script>
+    <!-- JQX Chart -->
+    <script type="text/javascript" src="../../jqwidgets/jqxchart.core.js"></script>
+    <script type="text/javascript" src="../../jqwidgets/jqxdraw.js"></script>
+    
+    <!-- Highcharts -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
+	<script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+        	
+            var url = "/demo/passengers";
+            // prepare the data
+            var source =
+            {
+                datatype: "json",
+                datafields: [
+                	{ name: 'passengerId' },
+                    { name: 'name' },
+                    { name: 'survived' },
+                    { name: 'passengerClass' },
+                    { name: 'sex' },
+                    { name: 'age' },
+                    { name: 'siblingSpouseCount' },
+                    { name: 'parentChildCount' },
+                    { name: 'ticketId' },
+                    { name: 'fare' },
+                    { name: 'cabinId' },
+                    { name: 'embarkedStation' }
+                ],
+                id: 'PassengerId',
+                url: url,
+                root: 'content',
+                beforeprocessing: function (data) {
+                    source.totalrecords = data.totalElements;
+                },
+                sort: function () {
+                    // update the grid and send a request to the server.
+                    $("#grid").jqxGrid('updatebounddata', 'sort');
+                },
+                filter: function () {
+                    // update the grid and send a request to the server.
+                    $("#grid").jqxGrid('updatebounddata', 'filter');
+                }
+                
+            };
+            var cellsrenderer = function (row, columnfield, value, defaulthtml, columnproperties, rowdata) {
+                if (value < 20) {
+                    return '<span style="margin: 4px; margin-top:8px; float: ' + columnproperties.cellsalign + '; color: #ff0000;">' + value + '</span>';
+                }
+                else {
+                    return '<span style="margin: 4px; margin-top:8px; float: ' + columnproperties.cellsalign + '; color: #008000;">' + value + '</span>';
+                }
+            }
+            var dataAdapter = new $.jqx.dataAdapter(source, {
+                downloadComplete: function (data, status, xhr) { },
+                loadComplete: function (data) {
+                	var records  = dataAdapter.records;
+                	drawChart(records);
+                },
+                loadError: function (xhr, status, error) { }
+            });
+            // initialize jqxGrid
+            $("#grid").jqxGrid(
+            {
+                width: getWidth('Grid'),
+                source: dataAdapter,                
+                pageable: true,
+                pagesize: 20,
+                autoheight: true,
+                sortable: true,
+                filterable: true,
+                sorttogglestates: 1,
+                altrows: true,
+                enabletooltips: true,
+                editable: false,
+                virtualmode: true,
+                rendergridrows: function (params) {
+                    return params.data;
+                },
+                columns: [
+                	{ text: 'Id', datafield: 'passengerId', width: 50 },
+                    { text: 'Name', datafield: 'name', width: 300 },
+                    { text: 'Age', datafield: 'age', width: 100, cellsalign: 'right' },
+                    { text: 'Sex', datafield: 'sex', width: 100 },
+                    { text: 'Survived', datafield: 'survived', width: 100},
+                    { text: 'Class', datafield: 'passengerClass', width: 100, cellsalign: 'right' },
+                    { text: 'Siblings count', datafield: 'siblingSpouseCount', width: 100, cellsalign: 'right' },
+                    { text: 'Parents count', datafield: 'parentChildCount', width: 100, cellsalign: 'right' },
+                    { text: 'Ticked Id', datafield: 'tickedId', width: 150 },
+                    { text: 'Fare', datafield: 'fare', width: 100, cellsalign: 'right', cellsformat: 'c2'  },
+                    { text: 'Cabin', datafield: 'cabinId', width: 100 },
+                    { text: 'Start Station', datafield: 'embarkedStation', width: 100, }
+                ]
+            });
+            $("#grid").bind("pagechanged", function (event) {
+                var args = event.args;
+                var pagenumber = args.pagenum;
+                var pagesize = args.pagesize;
+                source = []
+            });
+            $("#grid").bind("pagesizechanged", function (event) {
+                var args = event.args;
+                var pagenumber = args.pagenum;
+                var pagesize = args.pagesize;
+                source = []
+            });
+            $('#jqxFileUpload').jqxFileUpload({ width: 300, uploadUrl: '/demo/upload', fileInputName: 'file', multipleFilesUpload: false, accept: '.csv' });
+            $('#jqxFileUpload').on('uploadEnd', function (event) {
+                var args = event.args;
+                var fileName = args.file;
+                var serverResponse = args.response;
+                $('#upload-message').html(serverResponse);
+                $('#grid').jqxGrid('updatebounddata');
+            });
+            
+        	 // prepare chart data
+        	 // Build the chart
+        	 function drawChart(records){
+        		 var yes = 0, no = 0, total = 0;
+        		 for (const key of Object.keys(records)) {
+        			    if(records[key].survived == true) yes++; else no++;
+        		 }
+        		 
+        		 var chartData = [{
+        	            name: 'yes',
+        	            y: (yes / (yes + no)) * 100,
+        	            sliced: true,
+        	            selected: true
+        	        }, {
+        	            name: 'no',
+        	            y: (no / (yes + no)) * 100
+        	        }]
+        		 
+        		 
+        		 Highcharts.chart('chartContainer', {
+                     chart: {
+                         plotBackgroundColor: null,
+                         plotBorderWidth: null,
+                         plotShadow: false,
+                         type: 'pie'
+                     },
+                     title: {
+                         text: 'Survivor Chart'
+                     },
+                     tooltip: {
+                         pointFormat: '{series.survived}: <b>{point.percentage:.1f}%</b>'
+                     },
+                     plotOptions: {
+                         pie: {
+                             allowPointSelect: true,
+                             cursor: 'pointer',
+                             dataLabels: {
+                                 enabled: false
+                             },
+                             showInLegend: true
+                         }
+                     },
+                     series: [{
+                         name: 'Survivors',
+                         colorByPoint: true,
+                         data: chartData
+                     }]
+                 });
+        	 }
+            
+        });
+    </script>
+</head>
+<body class='default'>
+
+<div class="container-fluid">
+	<h4>Titanic Survivors - Demo App</h4>
+	<div class="row">
+		 <div class="col">
+		 	<!-- upload + grid -->
+		 	<div class="row">
+		 		<div class="col">
+		 		<!-- Upload -->
+		 			<div class="row">
+		 				<div class="col-md-auto"> CSV Upload: </div>
+						<div class="col-md-auto"> <div id="jqxFileUpload"></div></div>
+						<div class="col-md-auto"> <div class="alert alert-light" id="upload-message" role="alert">  </div></div>
+					</div>
+		 		</div>
+		 		<div class="w-100"></div>
+		 		<div class="col">
+		 			<div class="row">
+		 				<!-- Grid -->
+		 				<div class="col"> <div id="grid"></div> </div>
+		 				 <div class="col">
+		 					<!-- Charts -->
+		 					<div id='chartContainer' style="width:600px; height:400px"></div>
+						 </div>
+		 			</div>
+		 		</div>
+		 	</div>
+		 </div>
+	</div>
+</div>
+
+</body>
+</html>
