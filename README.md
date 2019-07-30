@@ -1,7 +1,11 @@
 # TitanicSurvivalDemoApp
 Demo of a full stack application with Spring Boot and JQX grid.
 
-Demo of application hosted in aws: <a href="http://ec2-3-86-103-32.compute-1.amazonaws.com:8080/">Demo</a>
+Demo of the application hosted in aws: 
+
+<a href="http://ec2-3-86-103-32.compute-1.amazonaws.com:8080/">URL</a>
+
+<a href="https://www.youtube.com/upload">Video Demonstration</a>
 
 This application uses data from the famous [kaggle titanic challenge](https://www.kaggle.com/c/titanic/data) to demonstrate RESTful services with a frontend.
 The application is created with Spring boot for RESTful layer, Spring Data JPA Repositories (with hibernate ORM) for handling all CRUD operations. The frontend is created with JQX grid and highcharts. The database used is MySQL version 5.6.
@@ -31,6 +35,8 @@ In MySQL console: - Creating database, application user and setting permissions.
 mysql -u root -p
 <root_password>
 
+Note:
+This application is not intended for commerical purposes.
 ```
 CREATE DATABASE titanic;
 CREATE USER 'demo'@'localhost' identified by 'demo123';
@@ -78,8 +84,6 @@ Setup details:
 LAUNCH CentOS7 EC2 instance from AWS Console.
 Create security group that allows port forwarding rules for inbound, outbound on 22 (SSH), 8080 (App port).
 We can access the server with Putty like SSH client by creating Auth keys.
-//share an url here
-// ssh to <aws_ip> with centos user login
 
 Installing necessary services:
 ```
