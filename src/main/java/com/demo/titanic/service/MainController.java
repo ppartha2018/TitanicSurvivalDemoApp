@@ -14,8 +14,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -58,6 +62,7 @@ public class MainController {
 		}
     }
 	
+	
 	/*
 	 * Method to serve grid of records with sorting and filter functionality with Pagination.
 	 * Pagination, Sorting is applied by using Spring JPA Repository's Page and Sort Interfaces. 
@@ -94,6 +99,31 @@ public class MainController {
 		}
 		
 		return persons;
+	}
+	
+	// rest method to get single user
+	@GetMapping(value = "/passengers/{passenger_id}", produces = "application/json")
+	public @ResponseBody Optional<Person> getPassenger(@PathVariable("passenger_id") Long passengerId){
+		return personDao.findById(passengerId);
+	}
+	
+	// rest method to create single user
+	@PostMapping(value = "/passengers")
+	public Person create(@RequestBody Person person) {
+		return personDao.save(person);
+	}
+	
+	// delete rest method with appropriate boolean response
+	@DeleteMapping(value = "/passengers/{passenger_id}")
+	public boolean delete(@PathVariable("passenger_id") Long passengerId) {
+		try {
+			personDao.deleteById(passengerId);
+			return true;
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
 	}
 	
 	/*@GetMapping(value = "/filter")
