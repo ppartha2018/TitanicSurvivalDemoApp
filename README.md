@@ -6,6 +6,7 @@ Demo of the application hosted in aws:
 <a href="http://ec2-3-86-103-32.compute-1.amazonaws.com:8080/">URL</a>
 
 <a href="https://youtu.be/rrcqo9NMdzU">Video Demonstration</a>
+Update: Add/Update/Delete functionalities: <a href="https://youtu.be/7e32zDFEkt0">Video Demo of update</a>
 
 This application uses data from the famous [kaggle titanic challenge](https://www.kaggle.com/c/titanic/data) to demonstrate RESTful services with a frontend.
 The application is created with Spring boot for RESTful layer, Spring Data JPA Repositories (with hibernate ORM) for handling all CRUD operations. The frontend is created with JQX grid, Bootstrap and highcharts. The database used is MySQL version 5.6.
