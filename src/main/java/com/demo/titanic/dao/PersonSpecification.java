@@ -35,6 +35,7 @@ public class PersonSpecification {
 			Predicate predicate = null;
 
 			try {
+				//todo: all the query parameters need to be sanitized and validated before proceeding
 				if (filterCount > 0) {
 					//eg: jqx grid sends individual filter parameters for all the filters applied
 					for (int i = 0; i < filterCount; i++) {
@@ -52,10 +53,20 @@ public class PersonSpecification {
 							predicate = criteriaBuilder.notLike(path, "%" + filterValue + "%");
 							break;
 						case "EQUAL":
-							predicate = criteriaBuilder.equal(path, filterValue);
+							if(path.getJavaType().getName().equals("boolean")) {
+								boolean filVal = (filterValue.equals("true")? true : false);
+								predicate = criteriaBuilder.equal(path, filVal);
+							} else {
+								predicate = criteriaBuilder.equal(path, filterValue);
+							}
 							break;
 						case "NOT_EQUAL":
-							predicate = criteriaBuilder.notEqual(path, filterValue);
+							if(path.getJavaType().getName().equals("boolean")) {
+								boolean filVal = (filterValue.equals("true")? true : false);
+								predicate = criteriaBuilder.notEqual(path, filVal);
+							} else {
+								predicate = criteriaBuilder.notEqual(path, filterValue);
+							}
 							break;
 						case "GREATER_THAN":
 							predicate = criteriaBuilder.greaterThan(path, filterValue);

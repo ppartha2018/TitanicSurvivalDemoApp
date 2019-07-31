@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -126,31 +128,34 @@ public class MainController {
 		return personDao.findById(passengerId);
 	}
 	
-	// rest method to create single user
-	@PostMapping(value = "/passengers")
-	public Person create(@RequestBody Person person) {
-		return personDao.save(person);
-	}
+	// rest method to create/update single record
+	@PostMapping(value = "/passengers", consumes = "application/json", produces="application/json")
+	public ResponseEntity<Person> create(@RequestBody Person person) {
+		try {
+			//can add more validation cases
+			System.out.println(person.getName());
+			return ResponseEntity.status(HttpStatus.OK).body(personDao.save(person));
+		}
+		catch(Exception e) {
+			//Most of the major exceptions are handled by the framework
+			//Error flow for save record
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}	
 	
 	// delete rest method with appropriate boolean response
-	@DeleteMapping(value = "/passengers/{passenger_id}")
-	public boolean delete(@PathVariable("passenger_id") Long passengerId) {
+	@DeleteMapping(value = "/passengers/{passengerId}")
+	public ResponseEntity<Boolean> delete(@PathVariable("passengerId") Long passengerId) {
 		try {
+			//can add more validation cases
 			personDao.deleteById(passengerId);
-			return true;
+			return ResponseEntity.status(HttpStatus.OK).body(true);
 		} catch(Exception e) {
+			//Most of the major exceptions are handled by the framework
+			//Error flow for save record
 			e.printStackTrace();
-			return false;
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
 		}
 		
 	}
-	
-	/*@GetMapping(value = "/filter")
-	Example of a single filter
-	public @ResponseBody String filterRecords() {
-		for(Person p: personDao.findBySexAndAge("male", 30)) {
-			System.out.println(p.getName());
-		}
-		return "executed";
-	}*/
 }
