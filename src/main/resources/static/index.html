@@ -62,11 +62,11 @@
                     { name: 'cabinId' },
                     { name: 'embarkedStation' }
                 ],
-                id: 'PassengerId',
+                id: 'passengerId',
                 url: url,
                 root: 'content',
                 beforeprocessing: function (data) {
-                    source.totalrecords = data.totalElements;
+                    source.totalrecords = data.records.totalElements;
                 },
                 sort: function () {
                     // update the grid and send a request to the server.
@@ -75,7 +75,59 @@
                 filter: function () {
                     // update the grid and send a request to the server.
                     $("#grid").jqxGrid('updatebounddata', 'filter');
-                }
+                },
+                addrow: function (rowid, rowdata, position, commit) {
+                    //actual server synchroniztion happens through update
+                    commit(true);
+                },
+
+                updaterow: function (rowid, rowdata, commit) {
+                    // synchronize with the server - send update command
+                    //console.log(rowdata)
+                    if(rowdata.name != null && rowdata.name){
+	                     $.ajax({
+	                       method: 'post',
+	                       dataType: 'json',
+	                       url: '/demo/passengers',
+	                       contentType: "application/json; charset=utf-8",
+	                       data: JSON.stringify(rowdata),
+	                       success: function (sdata, status, xhr) {
+	                           // update command is executed.
+	                           //console.log("Row update: "+ sdata);
+	                           rowdata.passengerId = sdata.passengerId
+	                           $('#upload-message').html("Record for Passenger: "+sdata.name+"  - updated sucessfully!");
+	                           commit(true);
+	                       }, 
+	                       error: function (data, status, xhr) {
+	                           // update command is executed.
+	                           //console.log("Row update: "+ data);
+	                           $('#upload-message').html("Record update failed!");
+	                           commit(false);
+	                       }
+	                   });
+                    } else{
+                    	$('#upload-message').html("Passenger name cannot be empty.");
+                    }
+                },
+                deleterow: function (rowid, commit) {
+                    // synchronize with the server - send delete command
+                    //console.log(rowid)
+                     $.ajax({
+                         dataType: 'json',
+                         method: 'delete',
+                         url: '/demo/passengers/'+rowid,
+                         cache: false,
+                         success: function (data, status, xhr) {
+                             // delete command is executed.
+                        	 $('#upload-message').html("Record deleted sucessfully!");
+                        	 commit(true);
+                        }, 
+                        error: function (data, status, xhr) {
+                            $('#upload-message').html("Record delete failed!");
+                            commit(false);
+                        }
+                     });
+               }
                 
             };
             var cellsrenderer = function (row, columnfield, value, defaulthtml, columnproperties, rowdata) {
@@ -89,8 +141,7 @@
             var dataAdapter = new $.jqx.dataAdapter(source, {
                 downloadComplete: function (data, status, xhr) { },
                 loadComplete: function (data) {
-                	var records  = dataAdapter.records;
-                	drawChart(records);
+                	drawSurvivorChart(data.survivedYes, data.survivedNo);
                 },
                 loadError: function (xhr, status, error) { }
             });
@@ -98,29 +149,68 @@
             $("#grid").jqxGrid(
             {
                 width: getWidth('Grid'),
+                height: 500,
                 source: dataAdapter,                
                 pageable: true,
                 pagesize: 20,
-                autoheight: true,
+                //autoheight: true,
                 sortable: true,
                 filterable: true,
                 sorttogglestates: 1,
                 altrows: true,
                 enabletooltips: true,
-                editable: false,
+                editable: true,
+                editmode: 'multiplecellsadvanced',
                 virtualmode: true,
                 rendergridrows: function (params) {
                     return params.data;
                 },
+                showtoolbar: true,
+                rendertoolbar: function (toolbar) {
+                    var me = this;
+                    var container = $("<div style='margin: 5px;'></div>");
+                    toolbar.append(container);
+                    container.append('<input id="addrowbutton" title="Enter new record" type="button" value="Add New Record" />');
+                    //container.append('<input style="margin-left: 5px;" id="updaterowbutton" type="button" value="Update Selected Row" />');
+                    container.append('<input style="margin-left: 5px;" id="deleterowbutton" type="button" value="Delete Selected Record" />');
+                    
+                    $("#addrowbutton").jqxButton();
+                    //$("#updaterowbutton").jqxButton();
+                    $("#deleterowbutton").jqxButton();
+                   
+                    // create new row.
+                    $("#addrowbutton").on('click', function () {
+                    	
+                    	var rowscount = $("#grid").jqxGrid('getdatainformation').rowscount;
+                    /* 	if(rowscount < 2){
+                    		$("#grid").jqxGrid({virtualmode: false});
+                    	}
+                    	else
+                    		$("#grid").jqxGrid({virtualmode: true}); */
+                    	var commit = $("#grid").jqxGrid('addrow', rowscount+1 , {}, 'first');
+                        //$("#grid").jqxGrid('ensurerowvisible', rowscount+1);
+                    });
+                    // delete row.
+                    $("#deleterowbutton").on('click', function () {
+                        var selectedrowindex = $("#grid").jqxGrid('getselectedrowindex');
+                        var rowscount = $("#grid").jqxGrid('getdatainformation').rowscount;
+                        if (selectedrowindex >= 0 && selectedrowindex < rowscount) {
+                           // var id = $("#grid").jqxGrid('getrowid', selectedrowindex);
+                            var selectedRowData = $('#grid').jqxGrid('getrowdata', selectedrowindex);
+                            var commit = $("#grid").jqxGrid('deleterow', selectedRowData.passengerId);
+                            $('#grid').jqxGrid('updatebounddata');
+                        }
+                    });
+                },
                 columns: [
-                	{ text: 'Id', datafield: 'passengerId', width: 50 },
-                    { text: 'Name', datafield: 'name', width: 300 },
-                    { text: 'Age', datafield: 'age', width: 100, cellsalign: 'right' },
+                	//{ text: 'Id', datafield: 'passengerId', width: 50, editable: false, type:'number' },
+                    { text: 'Passenger Name', datafield: 'name', width: 300 },
+                    { text: 'Age', datafield: 'age', width: 100, cellsalign: 'right', type:'number' },
                     { text: 'Sex', datafield: 'sex', width: 100 },
-                    { text: 'Survived', datafield: 'survived', width: 100},
-                    { text: 'Class', datafield: 'passengerClass', width: 100, cellsalign: 'right' },
-                    { text: 'Siblings count', datafield: 'siblingSpouseCount', width: 100, cellsalign: 'right' },
-                    { text: 'Parents count', datafield: 'parentChildCount', width: 100, cellsalign: 'right' },
+                    { text: 'Survived', datafield: 'survived', width: 100, type: 'Boolean'},
+                    { text: 'Class', datafield: 'passengerClass', width: 100, cellsalign: 'right', type:'number' },
+                    { text: 'Siblings count', datafield: 'siblingSpouseCount', width: 100, cellsalign: 'right', type:'number' },
+                    { text: 'Parents count', datafield: 'parentChildCount', width: 100, cellsalign: 'right', type:'number' },
                     { text: 'Ticked Id', datafield: 'tickedId', width: 150 },
                     { text: 'Fare', datafield: 'fare', width: 100, cellsalign: 'right', cellsformat: 'c2'  },
                     { text: 'Cabin', datafield: 'cabinId', width: 100 },
@@ -145,27 +235,22 @@
                 var fileName = args.file;
                 var serverResponse = args.response;
                 $('#upload-message').html(serverResponse);
+                //$("#grid").jqxGrid({virtualmode: true});
                 $('#grid').jqxGrid('updatebounddata');
             });
             
         	 // prepare chart data
         	 // Build the chart
-        	 function drawChart(records){
-        		 var yes = 0, no = 0, total = 0;
-        		 for (const key of Object.keys(records)) {
-        			    if(records[key].survived == true) yes++; else no++;
-        		 }
-        		 
+        	 function drawSurvivorChart(yes, no){
         		 var chartData = [{
         	            name: 'yes',
-        	            y: (yes / (yes + no)) * 100,
+        	            y: yes,
         	            sliced: true,
         	            selected: true
         	        }, {
         	            name: 'no',
-        	            y: (no / (yes + no)) * 100
+        	            y: no
         	        }]
-        		 
         		 
         		 Highcharts.chart('chartContainer', {
                      chart: {
@@ -178,7 +263,7 @@
                          text: 'Survivor Chart'
                      },
                      tooltip: {
-                         pointFormat: '{series.survived}: <b>{point.percentage:.1f}%</b>'
+                         pointFormat: '{series.survived}: <b>{point.y: 1f} ({point.percentage:.1f}%)</b>'
                      },
                      plotOptions: {
                          pie: {
@@ -221,7 +306,10 @@
 		 		<div class="col">
 		 			<div class="row">
 		 				<!-- Grid -->
-		 				<div class="col"> <div id="grid"></div> </div>
+		 				<div class="col"> 
+		 					  <div id="grid">
+    						  </div>
+		 				</div>
 		 				 <div class="col">
 		 					<!-- Charts -->
 		 					<div id='chartContainer' style="width:600px; height:400px"></div>

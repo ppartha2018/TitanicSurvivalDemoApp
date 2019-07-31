@@ -24,4 +24,6 @@ public interface PersonDAO extends PagingAndSortingRepository<Person, Long>, Jpa
 	// will generate the query: select * from Person where sex=@sex AND age=@age;
 	//just mentioned here for an example
 	List<Person> findBySexAndAge(String sex, int age);
+	//long countBySurvived(boolean survived);
+	long countBySurvived(boolean survived);
 }

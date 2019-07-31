@@ -3,8 +3,10 @@ package com.demo.titanic.dto;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import com.demo.titanic.utils.CustomStringDeSerializer;
 import com.demo.titanic.utils.NumericBooleanDeserializer;
 import com.demo.titanic.utils.NumericIntegerDeSerializer;
 import com.fasterxml.jackson.annotation.JsonAlias;
@@ -24,6 +26,7 @@ public class Person implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
+	@GeneratedValue
 	@JsonAlias("PassengerId")
 	private Long passengerId;
 	
@@ -38,6 +41,7 @@ public class Person implements Serializable {
 	private String name;
 	
 	@JsonAlias("Sex")
+	@JsonDeserialize(using=CustomStringDeSerializer.class)
 	private String sex;
 	
 	@JsonAlias("Age")
@@ -61,7 +65,7 @@ public class Person implements Serializable {
 	
 	@JsonAlias("Embarked")
 	private String embarkedStation;
-	
+
 	public Long getPassengerId() {
 		return passengerId;
 	}
