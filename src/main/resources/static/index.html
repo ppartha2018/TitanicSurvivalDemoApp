@@ -121,6 +121,7 @@
                              // delete command is executed.
                         	 $('#upload-message').html("Record deleted sucessfully!");
                         	 commit(true);
+                        	 $('#grid').jqxGrid('updatebounddata');
                         }, 
                         error: function (data, status, xhr) {
                             $('#upload-message').html("Record delete failed!");
@@ -180,13 +181,7 @@
                    
                     // create new row.
                     $("#addrowbutton").on('click', function () {
-                    	
                     	var rowscount = $("#grid").jqxGrid('getdatainformation').rowscount;
-                    /* 	if(rowscount < 2){
-                    		$("#grid").jqxGrid({virtualmode: false});
-                    	}
-                    	else
-                    		$("#grid").jqxGrid({virtualmode: true}); */
                     	var commit = $("#grid").jqxGrid('addrow', rowscount+1 , {}, 'first');
                         //$("#grid").jqxGrid('ensurerowvisible', rowscount+1);
                     });
@@ -195,10 +190,8 @@
                         var selectedrowindex = $("#grid").jqxGrid('getselectedrowindex');
                         var rowscount = $("#grid").jqxGrid('getdatainformation').rowscount;
                         if (selectedrowindex >= 0 && selectedrowindex < rowscount) {
-                           // var id = $("#grid").jqxGrid('getrowid', selectedrowindex);
                             var selectedRowData = $('#grid').jqxGrid('getrowdata', selectedrowindex);
                             var commit = $("#grid").jqxGrid('deleterow', selectedRowData.passengerId);
-                            $('#grid').jqxGrid('updatebounddata');
                         }
                     });
                 },

@@ -107,7 +107,6 @@ public class MainController {
 			long survivedYes = personDao.count(specs);
 			specs = PersonSpecification.applyFilter(filterCount.get(), queryParameters, "survived", false);
 			long survivedNo = personDao.count(specs);
-			System.out.println("REsult of count by survivedNo: "+ survivedNo);
 			result.put("survivedYes", survivedYes);
 			result.put("survivedNo", survivedNo);
 			
@@ -133,7 +132,7 @@ public class MainController {
 	public ResponseEntity<Person> create(@RequestBody Person person) {
 		try {
 			//can add more validation cases
-			System.out.println(person.getName());
+			System.out.println("REcord to add/update: "+ person.getName());
 			return ResponseEntity.status(HttpStatus.OK).body(personDao.save(person));
 		}
 		catch(Exception e) {
